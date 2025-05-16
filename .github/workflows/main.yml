@@ -1,0 +1,16 @@
+name: Discord Bot 
+on:
+  workflow_dispatch:
+    branches:
+      - main
+env:
+ TOKEN: ${{ secrets.TOKEN }}
+jobs:
+  install-depends:
+    runs-on: windows-latest
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Install Dependencies
+          run: |
+            pip
