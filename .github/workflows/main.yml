@@ -5,6 +5,7 @@ on:
         - main
 env:
  TOKEN: ${{ secrets.TOKEN }}
+ OWNERID: ${{ secrets.OWNERID }}
 jobs:
   run-bot:
     runs-on: windows-latest
