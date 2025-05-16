@@ -8,6 +8,7 @@ import os
 
 load_dotenv()
 token = os.getenv('TOKEN')
+ownerid = os.getenv('OWNERID')
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -73,9 +74,16 @@ async def on_reaction_add(reaction, user):
         if reaction.message.author == user:
             await reaction.message.pin()
             await reaction.remove(user) 
+@bot.tree.command(name="stop", description="Stops the bot.")
+async def stop(inter: discord.Interaction) -> None:
+    if inter.user.id == ownerid:
+        await inter.response.send_message("Stopping the bot...", ephemeral=True)
+        await bot.close()
+    else:
+        await inter.response.send_message("You are not allowed to stop the bot.", ephemeral=True)
 @bot.tree.command(name="rename", description="Renames the currently open forum to what you specify.")
 @app_commands.describe(name="The name you want to rename the forum to.")
-@app_commands.checks.cooldown(1, 600, key=lambda i: (i.user.id,))
+@app_commands.checks.cooldown(1, 60, key=lambda i: (i.user.id,))
 async def rename(inter: discord.Interaction, name: str) -> None:
         if inter.channel.type == discord.ChannelType.public_thread:
                 await inter.channel.edit(name=name)
