@@ -8,14 +8,14 @@ import os
 
 load_dotenv()
 token = os.getenv('TOKEN')
-ownerid = os.getenv('OWNERID')
+ownerid = int(os.getenv("OWNERID"))
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guild_reactions = True
 intents.reactions = True
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"), intents=intents)  # commands.when_mentioned_or("!") is used to make the bot respond to !ping and @bot ping
+bot = commands.Bot(command_prefix=commands.when_mentioned, intents=intents)  # commands.when_mentioned_or("!") is used to make the bot respond to !ping and @bot ping
 
 async def setup_hook() -> None:  # This function is automatically called before the bot starts
     await bot.tree.sync()   # This function is used to sync the slash commands with Discord it is mandatory if you want to use slash commands
@@ -39,6 +39,13 @@ def gbembed(emoji: str, value: Type, amount: int):
         description=f"{emoji} {format(amount, ',')}",
         color=discord.Color.from_rgb(250, 228, 88),
     )
+@bot.tree.command(name="stop", description="Stops the bot.")
+async def stop(inter: discord.Interaction) -> None:
+    if inter.user.id == ownerid:
+        await inter.response.send_message("Stopping the bot...", ephemeral=True)
+        await bot.close()
+    else:
+        await inter.response.send_message("You are not allowed to stop the bot.", ephemeral=True)
 @bot.tree.command(name="gb", description="Interacts with the gamebanana api.")
 @app_commands.describe(submission_id="The submission you want the api to get.")
 @app_commands.describe(type="The amount you want to get from the api.")
@@ -74,22 +81,15 @@ async def on_reaction_add(reaction, user):
         if reaction.message.author == user:
             await reaction.message.pin()
             await reaction.remove(user) 
-@bot.tree.command(name="stop", description="Stops the bot.")
-async def stop(inter: discord.Interaction) -> None:
-    if inter.user.id == ownerid:
-        await inter.response.send_message("Stopping the bot...", ephemeral=True)
-        await bot.close()
-    else:
-        await inter.response.send_message("You are not allowed to stop the bot.", ephemeral=True)
 @bot.tree.command(name="rename", description="Renames the currently open forum to what you specify.")
 @app_commands.describe(name="The name you want to rename the forum to.")
 @app_commands.checks.cooldown(1, 60, key=lambda i: (i.user.id,))
 async def rename(inter: discord.Interaction, name: str) -> None:
-        if inter.channel.type == discord.ChannelType.public_thread:
-                await inter.channel.edit(name=name)
-                await inter.response.send_message(f"Renamed the thread to {name}", ephemeral=True)
+        if inter.channel.type == discord.ChannelType.public_thread and inter.channel.owner_id == inter.user.id:
+            await inter.channel.edit(name=name)
+            await inter.response.send_message(f"Renamed the thread to {name}", ephemeral=True)
         else:
-                await inter.response.send_message("This command can only be used in a thread.", ephemeral=True)
+            await inter.response.send_message("This command can only be used in a thread that you own.", ephemeral=True)
 @bot.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
      if isinstance(error, app_commands.CommandOnCooldown):
