@@ -2,7 +2,7 @@ name: Rerun Bot
 
 on:
   workflow_run:
-    workflows: [Discord Bot, Rerun Bot]
+    workflows: [Discord Bot]
     types: [completed]
 env:
  TOKEN: ${{ secrets.TOKEN }}
