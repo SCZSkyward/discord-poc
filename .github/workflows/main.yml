@@ -3,6 +3,9 @@ on:
     push:
       branches:
         - main
+    workflow_run:
+        workflows: [Rerun Bot]
+        types: [completed]
 env:
  TOKEN: ${{ secrets.TOKEN }}
  OWNERID: ${{ secrets.OWNERID }}
