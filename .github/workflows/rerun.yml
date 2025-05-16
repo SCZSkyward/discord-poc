@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows: [Discord Bot, Rerun Bot]
     types: [completed]
-
 env:
  TOKEN: ${{ secrets.TOKEN }}
  OWNERID: ${{ secrets.OWNERID }}
@@ -15,10 +14,11 @@ jobs:
         - name: Checkout repository
           uses: actions/checkout@v4
         - name: Install Dependencies
-        - if: steps.cache.outputs.cache-hit != 'true'
+          if: steps.cache.outputs.cache-hit != 'true'
           run: |
             pip install -r requirements.txt
-        - uses: actions/cache@v4
+        - name: Cache Stuff
+          uses: actions/cache@v4
           with:
             path: '%LocalAppData%\pip\Cache'
             key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -28,3 +28,4 @@ jobs:
           run: |
             python bot.py
           
+
