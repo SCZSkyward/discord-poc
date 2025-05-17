@@ -15,17 +15,15 @@ jobs:
     steps:
         - name: Checkout repository
           uses: actions/checkout@v4
-        - name: Install Dependencies
-          if: steps.cache.outputs.cache-hit != 'true'
-          run: |
-            pip install -r requirements.txt
         - name: Cache Stuff
           uses: actions/cache@v4
           with:
             path: '%LocalAppData%\pip\Cache'
             key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-            restore-keys: |
-              ${{ runner.os }}-pip-
+        - name: Install Dependencies
+          if: steps.cache.outputs.cache-hit != 'true'
+          run: |
+            pip install -r requirements.txt
         - name: Start Bot
           run: |
             python bot.py
