@@ -3,25 +3,22 @@ on:
     push:
       branches:
         - main
-    workflow_run:
-        workflows: [Rerun Bot]
-        types: [completed]
 env:
  TOKEN: ${{ secrets.TOKEN }}
  OWNERID: ${{ secrets.OWNERID }}
 jobs:
   run-bot:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
         - name: Checkout repository
           uses: actions/checkout@v4
         - name: Cache Stuff
-          uses: actions/setup-python@v5
+          uses: actions/cache@v4
           with:
-            python-version: '3.13'
-            cache: 'pip'
-            cache-dependency-path: |
-                requirements.txt
+            path: ~/.cache/pip
+            key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+            restore-keys: |
+              ${{ runner.os }}-pip-
         - name: Install Dependencies
           run: |
             pip install -r requirements.txt
