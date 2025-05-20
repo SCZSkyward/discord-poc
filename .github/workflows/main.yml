@@ -8,20 +8,16 @@ env:
  OWNERID: ${{ secrets.OWNERID }}
 jobs:
   run-bot:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
         - name: Checkout repository
           uses: actions/checkout@v4
         - name: Cache Stuff
-          uses: actions/cache@v4
+        - uses: actions/setup-python@v2
           with:
-            path: ~/.cache/pip
-            key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-            restore-keys: |
-              ${{ runner.os }}-pip-
-        - name: Install Dependencies
-          run: |
-            pip install -r requirements.txt
+            python-version: '3.9'
+            cache: 'pip'
+        - run: pip install -r requirements.txt
         - name: Start Bot
           run: |
             python bot.py
